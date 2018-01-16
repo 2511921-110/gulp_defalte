@@ -10,6 +10,7 @@ const imageminJpg = require('imagemin-jpeg-recompress');
 const imageminPng = require('imagemin-pngquant');
 const imageminGif = require('imagemin-gifsicle');
 const mozjpeg  = require('imagemin-mozjpeg');
+const browserSync = require('browser-sync');
 
 // 圧縮前と圧縮後のディレクトリを定義
 const paths = {
@@ -17,12 +18,13 @@ const paths = {
   dstDir : 'dist/assets'// 圧縮後のディレクトリ
 }
 
-
+gulp.task('bs-reload', function () {
+  browserSync.reload();
+});
  
 //タスクの定義
 gulp.task("default", function() {
   // jpg,png,gif画像の圧縮タスク
-
     var srcGlob = paths.srcDir + '/**/*.+(jpg|jpeg|png|gif)';
     var dstGlob = paths.dstDir;
     gulp.watch( srcGlob , function(){
@@ -40,6 +42,14 @@ gulp.task("default", function() {
     ))
     .pipe(gulp.dest( dstGlob ));
     });
+    browserSync({
+      server: {
+         baseDir: "./dist"       //対象ディレクトリ
+        ,index  : "index.html"      //インデックスファイル
+      }
+    });
+  gulp.watch( "./dist/*.html" ,['bs-reload']);
+  gulp.watch( "./dist/css/*.css" ,['bs-reload']);
   gulp.watch("scss/style.scss", function(){
     gulp.src("scss/style.scss") //ファイルの参照先を指定
       .pipe(plumber())
